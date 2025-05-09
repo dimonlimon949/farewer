@@ -1,0 +1,21 @@
+{
+	"promoname": "1",
+	"promotip": "btc",
+	"promovalue": 1,
+	"promolimit": 1,
+	"fortuna": 22,
+	"fortunacount": 100,
+	"messagescount": 19963,
+	"kursplazma": 980000,
+	"kursobsidian": 830000,
+	"kursmateria": 290000,
+	"kursalmaz": 80000,
+	"kurszoloto": 120000,
+	"kurszhelezo": 150000,
+	"podarok": 0,
+	"reports": 14,
+	"timer25": 0,
+	"sell25": false,
+	"wait": true,
+	"prichina": "аааа"
+}

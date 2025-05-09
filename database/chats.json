@@ -1,0 +1,70 @@
+[
+	{
+		"id": 1,
+		"type": 1,
+		"uid": 0,
+		"antispam": true,
+		"statuemoney": 100000000000,
+		"statuepeople": 0,
+		"statuemsg": 150,
+		"statuemoneylvl": 3,
+		"statuepeoplelvl": 0,
+		"statuemsglvl": 0,
+		"reg": "2025-04-26T10:29:07.129Z",
+		"priz": false,
+		"start": false,
+		"gametime": 4,
+		"game": true,
+		"igra": false,
+		"games": [
+			{
+				"result": 2,
+				"stavka": true,
+				"hash": "6381a608cda4daf09e38cad509fb050c4aed8ffbdc86452adc0303fb78205af8",
+				"proverka": "2|POEIDUVe6pNxbzc",
+				"stavki": [],
+				"randomSource": "Crypto",
+				"generatorIcon": "🔐"
+			}
+		]
+	},
+	{
+		"id": 6,
+		"type": 1,
+		"uid": 1,
+		"antispam": true,
+		"statuemoney": 1000000000000000,
+		"statuepeople": 1000000,
+		"statuemsg": 9600000009,
+		"statuemoneylvl": 3,
+		"statuepeoplelvl": 6,
+		"statuemsglvl": 3,
+		"reg": "2025-04-26T10:29:13.979Z",
+		"priz": false,
+		"start": false,
+		"gametime": 60,
+		"game": false,
+		"igra": false,
+		"games": [],
+		"gift": 1746811558961
+	},
+	{
+		"id": 11,
+		"type": 4,
+		"uid": 2,
+		"antispam": true,
+		"statuemoney": 0,
+		"statuepeople": 0,
+		"statuemsg": 465,
+		"statuemoneylvl": 0,
+		"statuepeoplelvl": 0,
+		"statuemsglvl": 0,
+		"reg": "2025-04-26T22:06:27.470Z",
+		"priz": false,
+		"start": false,
+		"gametime": 60,
+		"game": false,
+		"igra": false,
+		"games": []
+	}
+]

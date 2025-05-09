@@ -1,0 +1,111 @@
+const utils = require('../utils.js');
+
+const works = [
+    {
+      name: "Дворник",
+      requiredLevel: 1,
+      min: utils.numstring("100.000"),
+      max: utils.numstring("200.000"),
+      id: 1,
+    },
+    {
+      name: "Сантехник",
+      requiredLevel: 2,
+      min: utils.numstring("200.000"),
+      max: utils.numstring("400.000"),
+      id: 2,
+    },
+    {
+      name: "Электрик",
+      requiredLevel: 3,
+      min: utils.numstring("400.000"),
+      max: utils.numstring("800.000"),
+      id: 3,
+    },
+    {
+      name: "Слесарь",
+      requiredLevel: 4,
+      min: utils.numstring("800.000"),
+      max: utils.numstring("1.600.000"),
+      id: 4,
+    },
+    {
+      name: "Юрист",
+      requiredLevel: 5,
+      min: utils.numstring("1.600.000"),
+      max: utils.numstring("3.200.000"),
+      id: 5,
+    },
+    {
+      name: "Бухгалтер",
+      requiredLevel: 7,
+      min: utils.numstring("3.200.000"),
+      max: utils.numstring("6.400.000"),
+      id: 6,
+    },
+    {
+      name: "Бармен",
+      requiredLevel: 10,
+      min: utils.numstring("6.400.000"),
+      max: utils.numstring("8.000.000"),
+      id: 7,
+    },
+    {
+      name: "Администратор",
+      requiredLevel: 15,
+      min: utils.numstring("8.000.000"),
+      max: utils.numstring("10.000.000"),
+      id: 8,
+    },
+    {
+      name: "Программист",
+      requiredLevel: 20,
+      min: utils.numstring("10.000.000"),
+      max: utils.numstring("11.000.000"),
+      id: 9,
+    },
+    {
+      name: "Главный Программист",
+      requiredLevel: 25,
+      min: utils.numstring("11.000.000"),
+      max: utils.numstring("12.000.000"),
+      id: 10,
+    },
+    {
+      name: "Директор",
+      requiredLevel: 35,
+      min: utils.numstring("12.000.000"),
+      max: utils.numstring("13.000.000"),
+      id: 11,
+    },
+    {
+      name: "Президент",
+      requiredLevel: 50,
+      min: utils.numstring("13.000.000"),
+      max: utils.numstring("14.000.000"),
+      id: 12,
+    },
+    {
+      name: "Мафиози",
+      requiredLevel: 100,
+      min: utils.numstring("14.000.000"),
+      max: utils.numstring("15.000.000"),
+      id: 13,
+    },
+    {
+      name: "Шахтер",
+      requiredLevel: 500,
+      min: utils.numstring("15.000.000"),
+      max: utils.numstring("16.000.000"),
+      id: 14,
+    },
+    {
+      name: "Создатель",
+      requiredLevel: 1000,
+      min: utils.numstring("16.000.000"),
+      max: utils.numstring("17.000.000"),
+      id: 15,
+    },
+  ];
+
+module.exports = works;
