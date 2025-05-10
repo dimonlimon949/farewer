@@ -141,8 +141,6 @@ let val3 = tokenData3.val3
 let val4 = tokenData3.val4
 let val5 = tokenData3.val5
 
-
-
 const tokenu = tokenData.user
 
 const usert = new VK({
@@ -294,59 +292,9 @@ const randomGenerators = {
   }
 };
 
-async function startNewGame(chat) {
-  const prizes = [
-    {value: 2, prob: 0.54, name: "Обычный приз", color: "\x1b[37m"},
-    {value: 3, prob: 0.23, name: "Необычный приз", color: "\x1b[36m"},
-    {value: 5, prob: 0.20, name: "Редкий приз", color: "\x1b[32m"},
-    {value: 50, prob: 0.03, name: "Ультра-редкий", color: "\x1b[35m"}
-  ];
 
-  // Выбираем случайный генератор
-  const generatorKeys = Object.keys(randomGenerators);
-  const randomGeneratorKey = generatorKeys[Math.floor(Math.random() * generatorKeys.length)];
-  const generator = randomGenerators[randomGeneratorKey];
 
-  // Получаем случайное значение
-  let randValue;
-  try {
-    randValue = generator.getRandom.constructor.name === 'AsyncFunction' 
-      ? await generator.getRandom() 
-      : generator.getRandom();
-  } catch (e) {
-    console.error(`Ошибка в генераторе ${generator.name}:`, e);
-    randValue = Math.random();
-  }
 
-  // Выбираем приз
-  let result;
-  let cumulativeProb = 0;
-  for (const prize of prizes) {
-    cumulativeProb += prize.prob;
-    if (randValue <= cumulativeProb) {
-      result = prize.value;
-      break;
-    }
-  }
-
-  // Генерация данных для проверки
-  const proverka = `${result}|${generateRandomString(15)}`;
-  const gamehash = await generateCustomHash(proverka);
-
-  // Обновление состояния игры
-  chat.games = [{
-    result,
-    stavka: true,
-    hash: gamehash,
-    proverka,
-    stavki: [],
-    randomSource: randomGeneratorKey,
-    generatorIcon: generator.icon
-  }];
-  chat.game = true;
-
-  return result;
-}
 
 async function testDistribution(runs = 1000) {
   const prizes = [
@@ -522,38 +470,73 @@ function timesss() {
 }
 
 
+
+// Функция для создания HMAC
+async function generateHMAC(data, secret) {
+  console.log("Вызвана функция generateHMAC");
+  const hmac = crypto.createHmac('sha256', secret);
+  hmac.update(data);
+  return hmac.digest('hex');
+}
+
+// Функция для генерации случайного секрета (ключа)
+function generateSecret(length = 32) {
+  console.log("Вызвана функция generateSecret");
+  return crypto.randomBytes(length).toString('hex');
+}
+
+let timerUpdated = false;
+let messageSentFiveSeconds = false;
+let messageSentThreeSeconds = false;
+
 setInterval(async () => {
+  console.log("Запуск setInterval...");
   timerUpdated = false;
   const chat = chats.find(chat => chat.type === 2);
   if (chat) {
+    console.log("Обнаружен чат типа 2, начало обработки...");
     for (const chat of chats) {
       if (chat.id >= 0 && chat.type == 2) {
+        console.log(`Обработка чата ID: ${chat.id}`);
         updateGameTime(chat);
+        console.log(`Время игры в чате ${chat.id}: ${chat.gametime}`);
 
         if (!chat.game) {
+          console.log(`Игра в чате ${chat.id} не активна, запуск новой игры...`);
           startNewGame(chat);
         }
         const lastGame = chat.games[chat.games.length - 1];
+        console.log(`Информация о последней игре в чате ${chat.id}:`, lastGame);
+
         if (chat.gametime <= 5 && chat.games[chat.games.length - 1].stavki.length > 0 && !messageSentFiveSeconds) {
+          console.log(`В чате ${chat.id} осталось <= 5 секунд, отправка сообщения о прекращении приема ставок...`);
           chat.games[chat.games.length - 1].stavka = false;
           vk.api.messages.send({
             chat_id: chat.id,
-            message: '⏳ До конца раунда осталось менее пяти секунд, ставки не принимаются! 🚫💰',
+            message: `⏳ До конца раунда осталось ${chat.gametime} секунд, ставки не принимаются! 🚫💰`,
             random_id: 0
           });
           messageSentFiveSeconds = true;
+          console.log(`Сообщение о прекращении приема ставок в чате ${chat.id} отправлено.`);
+        } else {
+          console.log(`В чате ${chat.id} не выполнены условия для отправки сообщения о прекращении приема ставок.`);
         }
 
         if (chat.gametime <= 2 && chat.games[chat.games.length - 1].stavki.length > 0 && !messageSentThreeSeconds) {
+          console.log(`В чате ${chat.id} осталось <= 2 секунд, отправка сообщения о результатах раунда...`);
           vk.api.messages.send({
             chat_id: chat.id,
             message: 'Итак, результаты раунда... 🎉✨',
             random_id: 0
           });
           messageSentThreeSeconds = true;
-
+          console.log(`Сообщение о результатах раунда в чате ${chat.id} отправлено.`);
+        } else {
+          console.log(`В чате ${chat.id} не выполнены условия для отправки сообщения о результатах раунда.`);
         }
+
         if (chat.gametime <= 0 && !timerUpdated && chat.games[chat.games.length - 1].stavki.length > 0) {
+          console.log(`Время игры в чате ${chat.id} истекло, обработка результатов...`);
           messageSentFiveSeconds = false;
           messageSentThreeSeconds = false;
           let win = [];
@@ -568,6 +551,7 @@ setInterval(async () => {
 
           for (let i = 0; i < win.length; i++) {
             let user = win[i];
+            console.log(`Обработка ставки пользователя ID: ${user.id} в чате ${chat.id}`);
             let gameResult = chat.games[chat.games.length - 1].result;
             let userId = user.id;
 
@@ -585,12 +569,12 @@ setInterval(async () => {
                 dbUser.balance2 += roundedWinnings;
 
 
-                if (dbUser.settings.topdon && (user.amount >= 1000)) {
+                if (dbUser.settings.topdon && (user.amount >= 10000)) {
                   dbUser.winStreaks = (dbUser.winStreaks || 0) + 1;
-                  const bonus = calculateBonus(dbUser, roundedWinnings, lastGame.result); 
+                  const bonus = calculateBonus(dbUser, roundedWinnings, lastGame.result);
                   const roundedBonus = Math.round(bonus);
                   dbUser.balance2 += roundedBonus;
-                  text += `💥 Бонус для [id${user.id}|${dbUser.tag}]: ${utils.sp(roundedBonus)} ${val4}\n`;
+                  text += `💥 Бонус : ${utils.sp(roundedBonus)} ${val4}\n`;
                 }
 
 
@@ -603,11 +587,6 @@ setInterval(async () => {
             }
           }
 
-          /*      function calculateBonus(user, winnings) {
-                  let userWinStreak = user.winStreaks;
-                  let bonus = 0;
-                  return bonus;
-                }*/
 
           let attachment;
           switch (chat.games[chat.games.length - 1].result) {
@@ -631,12 +610,106 @@ ${chat.games[chat.games.length - 1].hash}
             keyboard: JSON.stringify({}),
             random_id: 0
           });
+          console.log(`Сообщение с результатами игры в чате ${chat.id} отправлено.`);
+        } else {
+          console.log(`В чате ${chat.id} не выполнены условия для обработки результатов игры.`);
         }
       }
     }
     timerUpdated = true;
+    console.log("Обработка чатов завершена.");
+  } else {
+    console.log("Не найден чат типа 2.");
   }
 }, 1000);
+
+async function startNewGame(chat) {
+  console.log(`Вызвана функция startNewGame для чата ID: ${chat.id}`);
+
+  const prizes = [
+    { value: 2, prob: 0.54, name: "Обычный приз", color: "\x1b[37m" },
+    { value: 3, prob: 0.23, name: "Необычный приз", color: "\x1b[36m" },
+    { value: 5, prob: 0.20, name: "Редкий приз", color: "\x1b[32m" },
+    { value: 50, prob: 0.03, name: "Ультра-редкий", color: "\x1b[35m" }
+  ];
+  console.log("Список призов:", prizes);
+
+  const secret = generateSecret();
+  console.log("Сгенерированный секретный ключ:", secret); // Добавлено логирование секрета (ТОЛЬКО ДЛЯ ОТЛАДКИ!)
+
+  // Выбираем случайный генератор
+  console.log("Доступные генераторы:", Object.keys(randomGenerators));
+  const generatorKeys = Object.keys(randomGenerators);
+  const randomGeneratorKey = generatorKeys[Math.floor(Math.random() * generatorKeys.length)];
+  console.log("Выбран случайный ключ генератора:", randomGeneratorKey);
+  const generator = randomGenerators[randomGeneratorKey];
+  console.log("Выбранный генератор:", generator.name);
+
+  // Получаем случайное значение
+  let randValue;
+  try {
+    console.log("Попытка получить случайное значение от генератора:", generator.name);
+    randValue = generator.getRandom.constructor.name === 'AsyncFunction'
+      ? await generator.getRandom()
+      : generator.getRandom();
+    console.log("Сгенерированное случайное значение:", randValue);
+  } catch (e) {
+    console.error(`Ошибка в генераторе ${generator.name}:`, e);
+    console.log("Использование Math.random() из-за ошибки в генераторе.");
+    randValue = Math.random();
+    console.log("Сгенерировано случайное значение (Math.random()):", randValue);
+  }
+
+  // Выбираем приз
+  let result;
+  let cumulativeProb = 0;
+  console.log("Выбор приза...");
+  for (const prize of prizes) {
+    cumulativeProb += prize.prob;
+    console.log(`Текущая накопительная вероятность: ${cumulativeProb}, Вероятность приза "${prize.name}": ${prize.prob}`);
+    if (randValue <= cumulativeProb) {
+      result = prize.value;
+      console.log("Выбранный приз:", prize.name, " (значение:", result, ")");
+      break;
+    }
+  }
+  console.log("Результат выбора приза:", result);
+
+  // Создаем строку данных для HMAC (важно включать все значимые параметры)
+  const gameDataString = JSON.stringify({
+    result,
+    randValue,
+    randomSource: randomGeneratorKey,
+    prizes // Включаем информацию о призах, если это влияет на результат
+  });
+  console.log("Строка данных для HMAC:", gameDataString);
+
+  const gamehash = await generateHMAC(gameDataString, secret);
+  console.log("Сгенерированный gamehash:", gamehash);
+  const proverka = `${result}|${gamehash}`;
+  console.log("Proverka (данные + HMAC):", proverka);
+
+  // Обновление состояния игры
+  console.log("Обновление состояния игры в чате...");
+  chat.games = [{
+    result,
+    stavka: true,
+    hash: gamehash,
+    proverka,
+    stavki: [],
+    randomSource: randomGeneratorKey,
+    generatorIcon: generator.icon,
+    secret: secret // Сохраняем секрет для дальнейшей проверки (ВНИМАНИЕ: нужно хранить безопасно!)
+  }];
+  chat.game = true;
+  console.log("Состояние игры в чате обновлено.");
+
+  console.log("Игра завершена, результат:", result);
+  return result;
+}
+
+
+
 
 let user = new VK({
   token: tokenData.token,
@@ -3155,7 +3228,7 @@ function sendMessageToUser(id, message) {
 
 
 
-let timerUpdated = false;
+
 
 function updateGameTime(chat) {
   if (chat.gametime <= 0) {
@@ -3166,9 +3239,7 @@ function updateGameTime(chat) {
   }
 }
 
-let messageSentFiveSeconds = false;
 
-let messageSentThreeSeconds = false;
 
 setInterval(async () => {
   double.map(user => {
